@@ -5,7 +5,7 @@ from miszka import main, parse_args
 
 
 def test_round_trip():
-    main('--iterations 3 --no-click --delay 0.1')
+    main('--iterations 3 --delay 0.1')
 
 
 def test_pargs_no_click():
@@ -21,7 +21,7 @@ def test_pargs_no_click():
 
 def test_wondering():
     start_x, start_y = GetCursorPos()
-    main('miszka.py --no-click --delay 0.01 -i 1000 --no-anchor')
+    main('miszka.py --delay 0.01 -i 1000 --no-anchor')
     x, y = GetCursorPos()
     assert abs(x - start_x) <= 10
     assert abs(y - start_y) <= 10

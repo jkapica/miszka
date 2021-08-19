@@ -2,6 +2,7 @@ import shlex
 import sys
 from argparse import ArgumentParser
 from itertools import count
+from os.path import basename
 from random import randint
 from time import sleep
 from win32api import GetCursorPos, SetCursorPos, mouse_event
@@ -41,7 +42,7 @@ def parse_args(argv=None):
     elif isinstance(argv, str):
         argv = shlex.split(argv, posix=False)
 
-    if argv[0] in __file__ and not argv[0].startswith('-'):
+    if basename(__file__).startswith(basename(argv[0])):
         argv = argv[1:]
     return ap.parse_args(argv)
 
