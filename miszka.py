@@ -11,25 +11,29 @@ from win32con import MOUSEEVENTF_LEFTUP, MOUSEEVENTF_LEFTDOWN
 def parse_args(argv=None):
     ap = ArgumentParser()
     ap.add_argument(
-        '--no-click',
+        '--click',
         dest='click',
-        action='store_false',
-        default=True
+        action='store_true',
+        default=False
     )
     ap.add_argument(
-        '--park-delay',
+        '--delay', '-d',
         type=float,
-        default=60
+        default=120,
+        help='Delay between checks/moves',
     )
     ap.add_argument(
-        '--jitter-delay',
-        type=float,
-        default=120
-    )
-    ap.add_argument(
-        '--iterations',
+        '--iterations', '-i',
         type=int,
-        default=2*30
+        default=2*30,
+        help='How many checks/move to run',
+    )
+    ap.add_argument(
+        '--no-anchor',
+        action='store_false',
+        dest='anchor',
+        default=True,
+        help='How many checks/move to run',
     )
 
     if argv is None:
@@ -45,20 +49,23 @@ def parse_args(argv=None):
 def main(argv=None):
     pargs = parse_args(argv)
 
-    start = prev = GetCursorPos()
-    sleep(pargs.park_delay)
+    anchor = prev = GetCursorPos()
+    delay = pargs.delay
 
     counter = count(pargs.iterations, -1)
     while next(counter) > 0:
-        sleep(pargs.jitter_delay)
-        if GetCursorPos() == prev:  # No user action - run around parking spot
-            SetCursorPos([i + randint(-5, 5) for i in start])
+        sleep(delay)
+        if GetCursorPos() == prev:  # No user action detected - make a move
+            base = anchor if pargs.anchor else prev
+            SetCursorPos([i + randint(-5, 5) for i in base])
             if pargs.click:
                 mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0)
                 sleep(0.2)
                 mouse_event(MOUSEEVENTF_LEFTUP, 0, 0)
-        else:  # Moved since last check - reset parking spot
-            start = GetCursorPos()
+        else:  # Moved since last check - reset the anchor
+            delay = 10
+            anchor = GetCursorPos()
+        delay = pargs.delay
         prev = GetCursorPos()
 
 
